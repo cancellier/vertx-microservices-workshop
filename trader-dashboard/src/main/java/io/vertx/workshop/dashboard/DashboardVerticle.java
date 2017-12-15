@@ -63,7 +63,7 @@ public class DashboardVerticle extends MicroServiceVerticle {
 
     vertx.createHttpServer()
         .requestHandler(router::accept)
-        .listen(8080, ar -> {
+        .listen(8081, ar -> {
           if (ar.failed()) {
             future.fail(ar.cause());
           } else {
