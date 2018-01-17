@@ -2,7 +2,11 @@ package io.vertx.workshop.portfolio.impl;
 
 import io.vertx.core.*;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.client.HttpResponse;
+import io.vertx.ext.web.client.WebClient;
+import io.vertx.ext.web.codec.BodyCodec;
 import io.vertx.servicediscovery.ServiceDiscovery;
+import io.vertx.servicediscovery.types.HttpEndpoint;
 import io.vertx.workshop.portfolio.Portfolio;
 import io.vertx.workshop.portfolio.PortfolioService;
 
@@ -10,8 +14,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import io.vertx.ext.web.client.WebClient;
 
 /**
  * The portfolio service implementation.
@@ -30,23 +32,38 @@ public class PortfolioServiceImpl implements PortfolioService {
 
   @Override
   public void getPortfolio(Handler<AsyncResult<Portfolio>> resultHandler) {
-    // TODO
     // ----
-
+    resultHandler.handle(Future.succeededFuture(portfolio));
     // ----
   }
 
   private void sendActionOnTheEventBus(String action, int amount, JsonObject quote, int newAmount) {
-    // TODO
     // ----
-
+    vertx.eventBus().publish(EVENT_ADDRESS, new JsonObject()
+            .put("action", action)
+            .put("quote", quote)
+            .put("date", System.currentTimeMillis())
+            .put("amount", amount)
+            .put("owned", newAmount)
+    );
     // ----
   }
 
   @Override
   public void evaluate(Handler<AsyncResult<Double>> resultHandler) {
-    // TODO
     // ----
+    // First we need to discover and get a HTTP client for the `quotes` service:
+    HttpEndpoint.getWebClient(discovery, new JsonObject().put("name", "quotes"),
+            client -> {
+              if (client.failed()) {
+                // It failed...
+                resultHandler.handle(Future.failedFuture(client.cause()));
+              } else {
+                // We have the client
+                WebClient webClient = client.result();
+                computeEvaluation(webClient, resultHandler);
+              }
+            });
 
     // ---
   }
@@ -54,25 +71,38 @@ public class PortfolioServiceImpl implements PortfolioService {
   private void computeEvaluation(WebClient webClient, Handler<AsyncResult<Double>> resultHandler) {
     // We need to call the service for each company we own shares
     List<Future> results = portfolio.getShares().entrySet().stream()
-        .map(entry -> getValueForCompany(webClient, entry.getKey(), entry.getValue()))
-        .collect(Collectors.toList());
+            .map(entry -> getValueForCompany(webClient, entry.getKey(), entry.getValue()))
+            .collect(Collectors.toList());
 
     // We need to return only when we have all results, for this we create a composite future. The set handler
     // is called when all the futures has been assigned.
     CompositeFuture.all(results).setHandler(
-        ar -> {
-          double sum = results.stream().mapToDouble(fut -> (double) fut.result()).sum();
-          resultHandler.handle(Future.succeededFuture(sum));
-        });
+            ar -> {
+              double sum = results.stream().mapToDouble(fut -> (double) fut.result()).sum();
+              resultHandler.handle(Future.succeededFuture(sum));
+            });
   }
 
   private Future<Double> getValueForCompany(WebClient client, String company, int numberOfShares) {
     // Create the future object that will  get the value once the value have been retrieved
     Future<Double> future = Future.future();
 
-    //TODO
     //----
-
+    client.get("/?name=" + encode(company))
+            .as(BodyCodec.jsonObject())
+            .send(ar -> {
+              if (ar.succeeded()) {
+                HttpResponse<JsonObject> response = ar.result();
+                if (response.statusCode() == 200) {
+                  double v = numberOfShares * response.body().getDouble("bid");
+                  future.complete(v);
+                } else {
+                  future.complete(0.0);
+                }
+              } else {
+                future.fail(ar.cause());
+              }
+            });
     // ---
 
     return future;
@@ -83,14 +113,12 @@ public class PortfolioServiceImpl implements PortfolioService {
   public void buy(int amount, JsonObject quote, Handler<AsyncResult<Portfolio>> resultHandler) {
     if (amount <= 0) {
       resultHandler.handle(Future.failedFuture("Cannot buy " + quote.getString("name") + " - the amount must be " +
-          "greater than 0"));
-      return;
+              "greater than 0"));
     }
 
     if (quote.getInteger("shares") < amount) {
       resultHandler.handle(Future.failedFuture("Cannot buy " + amount + " - not enough " +
-          "stocks on the market (" + quote.getInteger("shares") + ")"));
-      return;
+              "stocks on the market (" + quote.getInteger("shares") + ")"));
     }
 
     double price = amount * quote.getDouble("ask");
@@ -106,7 +134,7 @@ public class PortfolioServiceImpl implements PortfolioService {
       resultHandler.handle(Future.succeededFuture(portfolio));
     } else {
       resultHandler.handle(Future.failedFuture("Cannot buy " + amount + " of " + name + " - " + "not enough money, " +
-          "need " + price + ", has " + portfolio.getCash()));
+              "need " + price + ", has " + portfolio.getCash()));
     }
   }
 
@@ -115,8 +143,7 @@ public class PortfolioServiceImpl implements PortfolioService {
   public void sell(int amount, JsonObject quote, Handler<AsyncResult<Portfolio>> resultHandler) {
     if (amount <= 0) {
       resultHandler.handle(Future.failedFuture("Cannot sell " + quote.getString("name") + " - the amount must be " +
-          "greater than 0"));
-      return;
+              "greater than 0"));
     }
 
     double price = amount * quote.getDouble("bid");
@@ -136,7 +163,7 @@ public class PortfolioServiceImpl implements PortfolioService {
       resultHandler.handle(Future.succeededFuture(portfolio));
     } else {
       resultHandler.handle(Future.failedFuture("Cannot sell " + amount + " of " + name + " - " + "not enough stocks " +
-          "in portfolio"));
+              "in portfolio"));
     }
 
   }
