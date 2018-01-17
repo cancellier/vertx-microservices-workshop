@@ -15,49 +15,23 @@ public class MarketDataProvider extends AbstractVerticle {
 
     public void get() {
 
-//        WebClient.create(vertx).get(443, "api.coinmarketcap.com", "/v1/ticker")
-//                .addQueryParam("convert", "EUR")
-//                .addQueryParam("limit", "0")
-//                .ssl(true)
-//                .send(ar -> {
-//                    if (!ar.succeeded()) {
-//                        ar.cause().printStackTrace();
-//                        return;
-//                    }
-//
-//                    final JsonArray objects = ar.result().bodyAsJsonArray();
-//                    objects.stream()
-//                            .map(o -> (JsonObject) o)
-//                            .filter(o -> symbols.contains(o.getString("symbol")))
-//                            .filter(o -> !"batcoin".equals(o.getString("id")))
-//                            .forEach(this::publish);
-//                });
+        WebClient.create(vertx).get(443, "api.coinmarketcap.com", "/v1/ticker")
+                .addQueryParam("convert", "EUR")
+                .addQueryParam("limit", "0")
+                .ssl(true)
+                .send(ar -> {
+                    if (!ar.succeeded()) {
+                        ar.cause().printStackTrace();
+                        return;
+                    }
 
-
-        final JsonObject template = new JsonObject()
-                .put("24h_volume_eur", "153450000")
-                .put("open", "0")
-                .put("total_supply", "21000000")
-                ;
-
-        publish(template
-                .put("symbol", "BTC")
-                .put("name", "bitcoin")
-                .put("price_eur", "" + (15345 +  new Random().nextInt(15345 / 5) / 10D))
-        );
-
-        publish(template
-                .put("symbol", "LTC")
-                .put("name", "litecoin")
-                .put("price_eur", "" + (167 +  new Random().nextInt(1670 / 5) / 10D))
-        );
-
-        publish(template
-                .put("symbol", "ETH")
-                .put("name", "ethereum")
-                .put("price_eur", "" + (566 +  new Random().nextInt(5660 / 5) / 10D))
-        );
-
+                    final JsonArray objects = ar.result().bodyAsJsonArray();
+                    objects.stream()
+                            .map(o -> (JsonObject) o)
+                            .filter(o -> symbols.contains(o.getString("symbol")))
+                            .filter(o -> !"batcoin".equals(o.getString("id")))
+                            .forEach(this::publish);
+                });
 
 
     }

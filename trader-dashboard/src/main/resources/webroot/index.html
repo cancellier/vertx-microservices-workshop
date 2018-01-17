@@ -44,12 +44,12 @@
                     <dd id="value">0</dd>
                     <dt>Total Value</dt>
                     <dd id="total">0</dd>
-                    <dt>Divinator Shares</dt>
-                    <dd id="divinator">0</dd>
-                    <dt>Black Coat Shares</dt>
-                    <dd id="blackcoat">0</dd>
-                    <dt>MacroHard Shares</dt>
-                    <dd id="macrohard">0</dd>
+                    <dt>litecoin Shares</dt>
+                    <dd id="litecoin">0</dd>
+                    <dt>Ethereum Shares</dt>
+                    <dd id="ethereum">0</dd>
+                    <dt>bitcoin Shares</dt>
+                    <dd id="bitcoin">0</dd>
                 </dl>
             </div>
 
@@ -236,32 +236,32 @@
                     $("#cash").html(res.cash);
                     for (var i = 0; i < res.shares.length ; i++){
                         if (res.shares[i]) {
-                            $("#share-" + res.shares[i].name).html(divinator);
+                            $("#share-" + res.shares[i].name).html(litecoin);
                         } else {
-                            $("#divinator").html(0);
+                            $("#litecoin").html(0);
                         }
                     }
 
-                    var divinator = res.shares["Divinator"];
-                    var macrohard = res.shares["MacroHard"];
-                    var blackcoat = res.shares["Black Coat"];
+                    var litecoin = res.shares["litecoin"];
+                    var bitcoin = res.shares["bitcoin"];
+                    var ethereum = res.shares["Ethereum"];
 
-                    if (divinator) {
-                        $("#divinator").html(divinator);
+                    if (litecoin) {
+                        $("#litecoin").html(litecoin);
                     } else {
-                        $("#divinator").html(0);
+                        $("#litecoin").html(0);
                     }
 
-                    if (macrohard) {
-                        $("#macrohard").html(macrohard);
+                    if (bitcoin) {
+                        $("#bitcoin").html(bitcoin);
                     } else {
-                        $("#macrohard").html(0);
+                        $("#bitcoin").html(0);
                     }
 
-                    if (blackcoat) {
-                        $("#blackcoat").html(blackcoat);
+                    if (ethereum) {
+                        $("#ethereum").html(ethereum);
                     } else {
-                        $("#blackcoat").html(0);
+                        $("#ethereum").html(0);
                     }
 
                     service.evaluate(function (err, result) {
@@ -298,7 +298,7 @@
                     strokeColor: "rgba(220,220,220,1)",
                     pointColor: "rgba(220,220,220,1)",
                     pointStrokeColor: "#fff",
-                    label: "Divinator"
+                    label: "Litecoin"
                 },
                 {
                     data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -306,7 +306,7 @@
                     strokeColor: "rgba(151,187,205,1)",
                     pointColor: "rgba(151,187,205,1)",
                     pointStrokeColor: "#fff",
-                    label: "Black Coat"
+                    label: "Ethereum"
                 },
                 {
                     data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -314,7 +314,7 @@
                     strokeColor: "rgba(80,90,180,1)",
                     pointColor: "rgba(80,90,180,1)",
                     pointStrokeColor: "#fff",
-                    label: "MacroHard"
+                    label: "Bitcoin"
                 }
             ]
         };
@@ -323,7 +323,8 @@
         var lastLabel = 10;
 
         setInterval(function () {
-            chart.addData([quotes.divinator, quotes.blackcoat, quotes.macrohard], ++lastLabel);
+        console.log(quotes);
+            chart.addData([quotes.Litecoin.ask, quotes.Ethereum.bid, quotes.Bitcoin.ask], ++lastLabel);
             chart.removeData();
         }, 3000);
 
