@@ -13,15 +13,15 @@ public class TraderUtils {
 
   private final static Random RANDOM = new Random();
 
-  public static String pickACompany() {
+  public static String pickACompany(JsonObject config) {
     int choice = RANDOM.nextInt(2);
     switch (choice) {
       case 0:
-        return "Divinator";
+        return "Ethereum";
       case 1:
-        return "MacroHard";
+        return "Bitcoin";
       default:
-        return "Black Coat";
+        return "Litecoin";
     }
   }
 

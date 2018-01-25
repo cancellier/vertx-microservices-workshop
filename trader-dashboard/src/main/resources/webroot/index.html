@@ -142,7 +142,7 @@
     var service;
     eventbus.onopen = function () {
         eventbus.registerHandler('market', function (error, message) {
-            //console.log('received a message on shares ' + JSON.stringify(message));
+            console.log('received a message on shares ' + JSON.stringify(message));
             handleStockUpdate(message.body);
         });
 
@@ -242,8 +242,8 @@
                         }
                     }
 
-                    var litecoin = res.shares["litecoin"];
-                    var bitcoin = res.shares["bitcoin"];
+                    var litecoin = res.shares["Litecoin"];
+                    var bitcoin = res.shares["Bitcoin"];
                     var ethereum = res.shares["Ethereum"];
 
                     if (litecoin) {
@@ -323,10 +323,10 @@
         var lastLabel = 10;
 
         setInterval(function () {
-        console.log(quotes);
+            console.log(quotes);
             chart.addData([quotes.Litecoin.ask, quotes.Ethereum.bid, quotes.Bitcoin.ask], ++lastLabel);
             chart.removeData();
-        }, 3000);
+        }, 60000);
 
     }
 

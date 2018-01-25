@@ -38,30 +38,6 @@ public class MarketDataProvider extends AbstractVerticle {
 
     private void publish(JsonObject ticker) {
 
-        /*
-        {
-            "id": "bitcoin",
-            "name": "Bitcoin",
-            "symbol": "BTC",
-            "rank": "1",
-            "price_usd": "8040.19",
-            "price_btc": "1.0",
-            "24h_volume_usd": "3158280000.0",
-            "market_cap_usd": "134184636435",
-            "available_supply": "16689237.0",
-            "total_supply": "16689237.0",
-            "max_supply": "21000000.0",
-            "percent_change_1h": "-0.47",
-            "percent_change_24h": "3.04",
-            "percent_change_7d": "33.53",
-            "last_updated": "1511127852",
-            "price_eur": "6816.3122782",
-            "24h_volume_eur": "2677526618.4",
-            "market_cap_eur": "113759051077"
-        }
-         */
-
-        // TO
 
         JsonObject message = new JsonObject()
                 .put("exchange", "coinmarketcap")
@@ -75,20 +51,6 @@ public class MarketDataProvider extends AbstractVerticle {
 
         vertx.eventBus().publish(GeneratorConfigVerticle.ADDRESS, message);
 
-        /*
-        "Divinator": {
-            "exchange": "vert.x stock exchange",
-            "symbol": "DVN",
-            "name": "Divinator",
-            "bid": 738,
-            "ask": 747,
-            "volume": 98000,
-            "open": 650,
-            "shares": 49006
-        }
-         */
-
-
     }
 
     @Override
@@ -100,7 +62,7 @@ public class MarketDataProvider extends AbstractVerticle {
                 .map(o -> (String) o)
                 .forEach(symbols::add);
 
-        vertx.setPeriodic(1 * 60 * 1000L, l -> get());
+        vertx.setPeriodic(60 * 1000L, l -> get());
         vertx.setTimer(5000L, l -> get());
     }
 }
