@@ -1,0 +1,12 @@
+{
+  "shares": [
+    {
+      "code": "BTC",
+      "name": "Bitcoin"
+    },
+    {
+      "code": "LTC",
+      "name": "Litecoin"
+    }
+  ]
+}
